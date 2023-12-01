@@ -1,0 +1,60 @@
+#include <iostream>
+#include <Windows.h> // Sleep( )
+#include <vector>
+#include <fstream>
+using namespace std;
+
+int main() {
+    int elapsedSeconds = 0, ni, no, T = 1, capacity = 120; //저장 공간 120으로 설정
+    int NI = 120, NO = 120, lost = 0;
+    float summ = 0, avg = 0, avgsum = 0, max_num = 0;
+    vector<int> q;
+    vector<int>::iterator it;
+    ofstream t7("HW13");
+
+    if (!t7) { //파일 오픈 불가시
+        cout << "can't open the file" << endl;
+        return 666;
+    }
+
+    while (elapsedSeconds < 18) { //18초 동안 실행, 시간은 바꿀 수 있음
+        Sleep(T * 1000);  // milliseconds
+        ni = rand() % NI;  // 0~119 random
+
+        if (capacity < q.size() + ni) { //입력 값이을 더했을 때 저장 용량을 넘기지 않게하기 위함
+            lost += q.size() + ni - capacity;
+            ni = capacity - q.size();
+        }
+
+        summ = 0;
+
+        for (int i = 0; i < ni; i++) {
+            int a = rand() % 20;
+            q.push_back(a);
+            summ += a; // 랜덤한 값들을 다 더함
+            if (max_num < a) max_num = a;
+        }
+
+        if (ni != 0) {  // ni가 0이면 나누기를 하지 않도록 체크
+            avg = summ / ni; // 평균을 구함
+            t7 << avg << endl; // 파일에 데이터 저장
+            avgsum += avg; // 각 상황에서의 평균값들을 더해서 저장
+        }
+
+        no = rand() % NO; // 0~119 random
+        for (int i = 0; i < no; i++) {
+            if (!q.empty()) q.erase(q.begin());
+        }
+
+        cout << q.size() << " lost = " << lost << endl; //총 사라진 값들도 출력. 누적으로 출력 됨
+        elapsedSeconds += T;
+    }
+
+    t7.close();
+    if (ni != 0) {  // ni가 0이면 나누기를 하지 않도록 체크
+        cout << "average num = " << avgsum / 18 << endl; // 평균 값들의 합의 평균을 구함, 시간이 바뀌면 18도 바뀜
+    }
+    cout << "maxnum = " << max_num << endl; //최대 값 출력
+
+    return 123;
+}
