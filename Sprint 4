@@ -1,0 +1,101 @@
+#include <iostream>
+#include <vector>
+#include <fstream>
+#include <iomanip>
+using namespace std;
+
+class Queue {
+public:
+    Queue(int cap) : data(cap), NI(-1), NO(-1), capacity(cap) {}
+
+
+    float calculateFullness() const {
+        if (isEmpty()) {
+            return 0.0f; // 큐가 비어있으면 0%
+        }
+
+        int size = NO - NI + 1;
+        if (size <= capacity) {
+            int size = NO - NI + 1;
+            return static_cast<float>(size) / capacity * 100.0f;
+        }
+        else {
+            return 100;
+        }
+        
+    }
+
+    int calculatePacketLoss() const {
+        if (isEmpty()) {
+            return 0; // 큐가 비어있으면 손실된 패킷 개수는 0
+        }
+        
+        int size = NO - NI + 1;
+        int lostPackets = size - capacity;
+        if (size <= capacity) {
+            return 0;
+        }
+        else {
+            return lostPackets;
+        }
+        
+    }
+
+    void enqueue(int item) {
+        if (isFull()) {
+            cout << "Queue is full\n";
+
+        }
+
+        if (isEmpty()) {
+            NI = 0; 
+        }
+
+        NO = NO + 1;
+        return;
+        data[NO] = item;
+    }
+
+private:
+    vector<int> data;
+    int NI; 
+    int NO;
+    int capacity;
+
+    bool isEmpty() const {
+        return NI == -1;
+    }
+
+    bool isFull() const {
+        return (NO + 1) % capacity == NI;
+    }
+};
+
+
+int main() {
+    const int capacity = 10; //고정값
+    Queue myQueue(capacity);
+    myQueue.enqueue(1); 
+
+    ofstream outFile("HW13.csv");
+
+    if (!outFile.is_open()) {
+        cerr << "Unable to open the file.\n";
+        return 1;
+    }
+
+    outFile << "NO,Fullness,PacketLoss\n";
+
+    for (int i = 1; i <= 20; ++i) {
+        myQueue.enqueue(i);
+        float fullness = myQueue.calculateFullness();
+        int packetLoss = myQueue.calculatePacketLoss();
+        outFile << i << "," << setprecision(2) << fixed << fullness << "," << packetLoss << "\n";
+    }
+
+    outFile.close();
+
+    cout << "Data written to HW13.csv\n";
+
+    return 0;
+}
